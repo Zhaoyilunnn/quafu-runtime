@@ -14,7 +14,7 @@ class RuntimeClient:
             url: Runtime client api url.
         """
         self._token = token
-        self._url = url + "/runtime"
+        self._url = url + "/qbackend"
         self._session = requests.session()
         self.headers = {
             "Content-Type": "application/json;charset=UTF-8",
