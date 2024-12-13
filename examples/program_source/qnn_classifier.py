@@ -46,7 +46,7 @@ def generate_random_dataset(num_inputs, num_samples):
 
 def run():
 
-    dataset = generate_random_dataset(2, 100)
+    dataset = generate_random_dataset(2, 50)
 
     x = dataset.tensors[0]
 
@@ -110,7 +110,8 @@ def run():
 
     # To execute on real quantum machine, set the `backend` parameter
     # qnn1 = QuantumNeuralNetwork(num_qubits, encoder_layer + entangle_layer, backend="<device-name>")
-    qnn1 = QuantumNeuralNetwork(num_qubits, encoder_layer + entangle_layer)
+    qnn1 = QuantumNeuralNetwork(num_qubits, encoder_layer + entangle_layer, backend="real", sync=True)
+    qnn1.measure([0, 1], [0, 1])
 
     # Convert to torch module
     model1 = ModuleWrapper(qnn1)
@@ -124,7 +125,7 @@ def run():
 
     learning_rate = 0.1
     batch_size = 8
-    num_epochs = 5
+    num_epochs = 1
 
     # Train the classifier
     # Define the loss function and optimizer
