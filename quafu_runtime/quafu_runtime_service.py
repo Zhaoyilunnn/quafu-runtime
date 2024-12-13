@@ -267,6 +267,56 @@ class RuntimeService:
         response = response["data"]
         return response["id"]
 
+    def direct_run_program(self, data: str, metadata: dict = None):
+        """Run a program on runtime server.
+
+        Args:
+            data: program str or the path of a program file(base64 encoded).
+            metadata: a dict or a file path.
+                 * name: Name of the program.
+                 * backend: Backend to run the circuits of the program.
+                 * group: Not used. Group the program shared.
+                 * description: Program description.
+                 * max_execution_time: Maximum execution time.
+                 * is_public: Whether the program should be public.
+
+        Return:
+            Program_id, if upload succeed.
+        """
+        program_metadata = self._read_metadata(metadata)
+
+        filename = None
+        if "def run(" not in data:
+            # This is the program file
+            with open(data, "r", encoding="utf-8") as file:
+                data = file.read()
+            filename = data
+        # Check the program before upload it!
+        if filename is None:
+            filename = "upload_temp.py"
+            file = open(filename, "w")
+            file.write(data)
+            file.close()
+        check(data, filename)
+
+        # Run it.
+        program_data = to_base64_string(data)
+        status_code, response = self._client.program_run_direct(
+            program_data=program_data
+        )
+        if status_code == 201:
+            raise CheckApiTokenError("API_TOKEN ERROR.", response[MESSAGE]) from None
+        if status_code == 409:
+            raise DuplicateProgramException(
+                "Program with the same name already exists."
+            ) from None
+        elif status_code == 406:
+            raise ArgsException("You have not provide enough args.") from None
+        elif status_code != 200:
+            raise RunFailedException(f"Failed to run program: Unkown Error.") from None
+        response = response["data"]
+        return response
+
     def update_program(
         self,
         program_id: str,

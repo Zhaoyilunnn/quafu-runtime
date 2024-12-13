@@ -23,7 +23,8 @@ class Account:
             self.load_account()
         else:
             self._token = api_token
-            self._url = "http://120.46.209.71"
+            # self._url = "http://120.46.209.71"
+            self._url = "http://127.0.0.1:5050"
             self._url_ws = "ws://119.3.224.187:8760"
 
     def save_api_token(self, api_token: str):
